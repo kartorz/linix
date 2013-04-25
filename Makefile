@@ -7,6 +7,7 @@ include common.mk
 a11: linix
 
 linix: $(OBJS)
+	-test -d bin || mkdir bin
 	gcc -o bin/$@.$(KERNEL_SUF)   $^ $(LDFLAGS)
 
 #subdir: force
@@ -15,4 +16,4 @@ linix: $(OBJS)
 .PHONY : clean
 
 clean:
-	@rm $(OBJS)
+	@find . -name "*.o" | xargs -I{} rm {}
