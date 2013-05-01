@@ -1,19 +1,23 @@
 
-include boot/makefile.inc
-include kernel/makefile.inc
+include boot/Makefile.inc
+
+OBJS += kernel/kernel.a
+
+subdirs = kernel
 
 include common.mk
 
-a11: linix
+a11: subdir linix
 
 linix: $(OBJS)
 	-test -d bin || mkdir bin
 	gcc -o bin/$@.$(KERNEL_SUF)   $^ $(LDFLAGS)
 
-#subdir: force
-#	$(foreach d, $(subdirs), $(MAKE) -C $(dir))
+subdir: force
+	$(foreach d, $(subdirs), $(MAKE) -C $(d))
 
-.PHONY : clean
+.PHONY : clean force
 
 clean:
-	@find . -name "*.o" | xargs -I{} rm {}
+	@find . -name "*.[oadP]" | xargs -I{} rm {}
+	-rm -f bin/*
