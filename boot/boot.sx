@@ -19,16 +19,23 @@
 # define MULTIBOOT_HEADER_FLAGS         0x00010003
 #endif
 
-.section .data
+#define BIT_PE    0x01
+#define DESC_SIZE 0x08
+#define TEMP_TABLE_SIZE 0x02
+#define LINEAR_SEL 1
+#define LINEAR_LO 0x0000FFFF
+#define LINEAR_HI 0x000C9F00       
+.data
+gdt_table:
+        /* NULL desc */
+        .long 0
+        .long 0
         
-.equ    BIT_PE,    0x01
-        
-gdt_desc:
-        .long 0x00802F00
-        .long 0x0000ffff
-        
+        /* linear desc*/
+        .long 0
+        .long 0
 .bss
-    .lcomm gdt_table_temp 8
+    .comm gdt_table_base  DESC_SIZE*TEMP_TABLE_SIZE
         
 .text
      
@@ -77,30 +84,31 @@ multiboot_entry:
             call    EXT_C(cmain)
 
             /* load temp gdt */
-        	movl  $gdt_desc, %ebx
-            movl  $gdt_table_temp,  %ecx
-            movl  (%ebx),  %eax
-            movl  %eax, (%ecx)
-            movl  4(%ebx), %eax
-            movl  %eax,  4(%ecx)
-            LGDT   gdt_table_temp
+            movl  $gdt_table_temp,    %ecx
+            movl  $0,   (%ecx)
+            movl  $0,   4(%ecx) 
+      
+            movl  $(LINEAR_LO), 8(%ecx)
+            movl  $(LINEAR_HI),  12(%ecx)
+            lgdtl   gdt_table_temp
 
             /*Switch to protected mode */
             movl    %cr0,  %eax
             or      BIT_PE,  %eax
             movl    %eax,  %cr0
-            movl    $0x01, %eax
-            movl    %eax,   %cs
+            jmp     protected_mode_entry
+        
+protected_mode_entry:
+            movl    LINEAR_SEL, %eax
             movl    %eax,   %ds
             movl    %eax,   %es
             
                     /* Halt. */
             pushl   $halt_message
             call    EXT_C(printf)
-        
 loop: hlt
             jmp     loop
-        
+
 halt_message:
             .asciz  "Halted."
      
