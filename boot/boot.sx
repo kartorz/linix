@@ -22,96 +22,100 @@
 #define BIT_PE    0x01
 #define DESC_SIZE 0x08
 #define TEMP_TABLE_SIZE 0x02
-#define LINEAR_SEL 1
+#define LINEAR_SEL 1*DESC_SIZE
 #define LINEAR_LO 0x0000FFFF
-#define LINEAR_HI 0x000C9F00       
+#define LINEAR_HI 0x000C9F00
+        
 .data
-gdt_table:
+temp_gdt:
         /* NULL desc */
         .long 0
         .long 0
         
-        /* linear desc*/
-        .long 0
-        .long 0
-.bss
-    .comm gdt_table_base  DESC_SIZE*TEMP_TABLE_SIZE
+         /* linear desc*/
+        .long LINEAR_LO
+        .long LINEAR_HI
+.bss    
+        .align 2
+        .comm temp_gdt_scratch, 6
         
 .text
-     
 .globl  _start
 _start:
-			jmp     multiboot_entry
-     
+		jmp     multiboot_entry
+        
 			/* Align 32 bits boundary. */
-			.align  4
-     
+		.align  4
+        
 /* Multiboot header. */
 multiboot_header:
-			/* magic */
-            .long   MULTIBOOT_HEADER_MAGIC
-            /* flags */
-            .long   MULTIBOOT_HEADER_FLAGS
-            /* checksum */
-            .long   -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+		/* magic */
+        .long   MULTIBOOT_HEADER_MAGIC
+        /* flags */
+        .long   MULTIBOOT_HEADER_FLAGS
+        /* checksum */
+        .long   -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 	#ifndef __ELF__
             /* header_addr */
-            .long   multiboot_header
-            /* load_addr */
-            .long   _start
-            /* load_end_addr */
-            .long   _edata
-            /* bss_end_addr */
-            .long   _end
-            /* entry_addr */
-            .long   multiboot_entry
+        .long   multiboot_header
+        /* load_addr */
+        .long   _start
+        /* load_end_addr */
+        .long   _edata
+        /* bss_end_addr */
+        .long   _end
+        /* entry_addr */
+        .long   multiboot_entry
     #endif /* ! __ELF__ */
         
 multiboot_entry:        
-            /* Initialize the stack pointer. */
-            movl    $(stack + STACK_SIZE), %esp
-     
-            /* Reset EFLAGS. */
-            pushl   $0
-            popf
-     
-            /* Push the pointer to the Multiboot information structure. */
-            pushl   %ebx
-            /* Push the magic value. */
-            pushl   %eax
-     
-            /* Now enter the C main function... */
-            call    EXT_C(cmain)
+        /* Initialize the stack pointer. */
+        movl    $(stack + STACK_SIZE), %esp
+        
+        /* Reset EFLAGS. */
+        pushl   $0
+        popf
+        
+        /* Push the pointer to the Multiboot information structure. */
+        pushl   %ebx
+        /* Push the magic value. */
+        pushl   %eax
+        
+        /* Now enter the C main function... */
+        call    EXT_C(cmain)
 
-            /* load temp gdt */
-            movl  $gdt_table_temp,    %ecx
-            movl  $0,   (%ecx)
-            movl  $0,   4(%ecx) 
-      
-            movl  $(LINEAR_LO), 8(%ecx)
-            movl  $(LINEAR_HI),  12(%ecx)
-            lgdtl   gdt_table_temp
-
+        /* load temp gdt */
+        lea     temp_gdt, %ecx
+        movl    $0,   (%ecx)
+        movl    $0,   4(%ecx) 
+        movl    $(LINEAR_LO), 8(%ecx)
+        movl    $(LINEAR_HI),  12(%ecx)
+            
+        movl    $temp_gdt_scratch,    %ebx
+        movw   $15, (%ebx)
+        movl    %ecx, 2(%ebx)
+        lgdtl   temp_gdt_scratch
+        
             /*Switch to protected mode */
-            movl    %cr0,  %eax
-            or      BIT_PE,  %eax
-            movl    %eax,  %cr0
-            jmp     protected_mode_entry
+        movl    %cr0,  %eax
+        or      BIT_PE,  %eax
+        movl    %eax,  %cr0
+        jmp     protected_mode_entry
         
 protected_mode_entry:
-            movl    LINEAR_SEL, %eax
-            movl    %eax,   %ds
-            movl    %eax,   %es
-            
-                    /* Halt. */
-            pushl   $halt_message
-            call    EXT_C(printf)
+        movl    LINEAR_SEL, %eax
+        movl    %eax,   %ds
+        movl    %eax,   %es
+        
+        /* Halt. */
+        pushl   $halt_message
+        call    EXT_C(printf)
 loop: hlt
             jmp     loop
 
 halt_message:
-            .asciz  "Halted."
+        .asciz  "Halted."
      
             /* Our stack area. */
-            .comm   stack, STACK_SIZE
+        .comm   stack, STACK_SIZE
         
