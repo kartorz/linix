@@ -19,12 +19,18 @@
 # define MULTIBOOT_HEADER_FLAGS         0x00010003
 #endif
 
+#define CS_BASE 0x0FFFF0000
+#define RAM_START   0x400
+#define TSS_INDEX   10        
+
+        
 #define BIT_PE    0x01
 #define DESC_SIZE 0x08
 #define TEMP_TABLE_SIZE 0x02
 #define LINEAR_SEL 1*DESC_SIZE
 #define LINEAR_LO 0x0000FFFF
 #define LINEAR_HI 0x000C9F00
+
         
 .data
 temp_gdt:
@@ -35,10 +41,15 @@ temp_gdt:
          /* linear desc*/
         .long LINEAR_LO
         .long LINEAR_HI
-.bss    
+.bss
         .align 2
         .comm temp_gdt_scratch, 6
+        .comm app_gdt_ram,  6
+        .comm app_idt_ram,  6
         
+data_segment_len:
+        .long data_segmnet_size - temp_gdt
+
 .text
 .globl  _start
 _start:
@@ -94,7 +105,8 @@ multiboot_entry:
         movl    $temp_gdt_scratch,    %ebx
         movw   $15, (%ebx)
         movl    %ecx, 2(%ebx)
-        lgdtl   temp_gdt_scratch
+        db 66h                  
+        lgdt   temp_gdt_scratch
         
             /*Switch to protected mode */
         movl    %cr0,  %eax
@@ -103,9 +115,28 @@ multiboot_entry:
         jmp     protected_mode_entry
         
 protected_mode_entry:
-        movl    LINEAR_SEL, %eax
-        movl    %eax,   %ds
-        movl    %eax,   %es
+        movl    LINEAR_SEL, %ax
+        movw    %ax,   %ds
+        movw    %ax,   %es
+
+        /*copy EPROM to ram */
+        movl    $(RAM_START),   %eax
+        addl    data_segment_len, %eax
+        movl    $(RAM_START),   %ebx
+        movl    $(CS_BASE), %ecx
+        addl    $(GDT_EPROM_LEN),   %ecx
+        
+        movl    2(%ecx), %esi
+        movl    %eax,   %edi
+        movzx   (%ecx), %ecx
+        movw    %cx,    app_gdt_ram
+        inc     %ecx
+        movl    %eax,   %edx
+        movl    %eax,   app_gdt_ram(2,0,0)
+        add     %ecx,   %eax
+copy_eprom_gdt: 
+        movls    %ds:%esi, %es:%edi
+        loop    copy_eprom_gdt
         
         /* Halt. */
         pushl   $halt_message
