@@ -69,6 +69,13 @@
 /* Is there video information? */
 #define MULTIBOOT_INFO_VIDEO_INFO               0x00000800
      
+/* The flags for the Multiboot header. */
+#ifdef __ELF__
+# define MULTIBOOT_HEADER_FLAGS         0x00000003
+#else
+# define MULTIBOOT_HEADER_FLAGS         0x00010003
+#endif
+
 #ifndef ASM_FILE
      
 typedef unsigned short          multiboot_uint16_t;
