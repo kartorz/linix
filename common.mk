@@ -1,7 +1,8 @@
-
+TOPDIR =  /home/joni/Projects/linix/linix
 CC = gcc
 DEFINES :=
-LDFLAGS = -nostdlib -fno-stack-protector -fstack-protector-all
+CFLAGS += -I$(TOPDIR)/include
+LDFLAGS += -nostdlib -fno-stack-protector -fstack-protector-all
 KERNEL_SUF = img
 
 %o : %sx
