@@ -1,7 +1,8 @@
-objs =  putstr.o \
-        realprot.o \
-        printf.o \
-        conio.o 
+objs =  realprot.o \
+		putstr.o \
+        conio.o \
+        message.o \
+        dump_eax.o
 
 lib_a = i386.a
 

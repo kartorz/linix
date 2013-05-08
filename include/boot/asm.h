@@ -7,11 +7,14 @@
  *  You can find the minix websit in the README file and, get more information about minix.
  */
 
+#define _ALIGN_TEXT .align 16
 
-define _ALIGN_TEXT .align 16
 
 #define _ENTRY(x) \
 	.text; _ALIGN_TEXT; .globl x; .type x,@function; x:
+
+#define ENTRY(x) _ENTRY(x)
+
 #define _LABEL(x) \
 	.globl x; x:
 

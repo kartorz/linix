@@ -46,9 +46,9 @@ gdtarg:
 	.word	gdtlen-1		/* limit */
 	.long	0			/* physical addr, will be inserted */
 
-toreal:	.word	xreal			/* off:seg address for indirect jump */
+ toreal:    .word	xreal			/* off:seg address for indirect jump */
 
-ENTRY(gdt_init)
+_ENTRY(gdt_init)
      .code32
      lgdt	%cs:gdtarg		/* Global descriptor table */
      ret
@@ -68,7 +68,7 @@ ENTRY(gdt_init)
  * having to setup a different IDT.  This code is only used during
  * the boot process and it doesn't use any interrupts.
  */
-ENTRY(real_to_prot)
+_ENTRY(real_to_prot)
 	.code16
 	pushl	%eax
 	cli
@@ -88,7 +88,6 @@ ENTRY(real_to_prot)
 	mov	%ax, %ds
 	mov	%ax, %es
 	mov	%ax, %ss
-	addl	stkdif, %esp		/* Allow for real %ss != %ds */
 
 	popl	%eax
 	ret
@@ -109,7 +108,7 @@ ENTRY(real_to_prot)
  * reference book.
  */
 
-ENTRY(prot_to_real)
+_ENTRY(prot_to_real)
 	.code32
 	pushl	%eax
 	/*
@@ -148,10 +147,7 @@ xreal:
 	 * If stack was above 64k, 16bit %ss needs to be different from
 	 * 32bit %ss (and the other segment registers).
 	 */
-	mov	stkseg, %ax
-	mov	%ax, %ss
-	subl	stkdif, %esp
-
+        
 	/* Check we are returning to an address below 64k */
 	push	%bp
 	movw	%sp, %bp
@@ -178,6 +174,7 @@ xreal:
 dump_eax_buff:
 	. = . + 16
 
+
 #ifdef EPIA_HACK
 trash_return_cache:
 	.code32
@@ -189,10 +186,9 @@ trash_return_cache:
  * convert boot time 'linear' address to a physical one
  */
 
-ENTRY(vtophys)
+_ENTRY(vtophys)
 	.code32
 	xorl	%eax, %eax
-	movw	ourseg, %ax
 	shll	$4, %eax
 	addl	4(%esp), %eax
 	ret

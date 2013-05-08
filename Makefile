@@ -1,5 +1,4 @@
 
-include boot/Makefile.inc
 
 OBJS += kernel/kernel.a
 
@@ -15,6 +14,9 @@ linix: $(OBJS)
 
 subdir: force
 	$(foreach d, $(subdirs), $(MAKE) -C $(d))
+
+boot: force
+	$(MAKE) -C boot
 
 .PHONY : clean force
 

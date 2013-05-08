@@ -1,15 +1,19 @@
-TOPDIR =  /home/joni/Projects/linix/linix
 CC = gcc
-DEFINES :=
-CFLAGS += -I$(TOPDIR)/include
-LDFLAGS += -nostdlib -fno-stack-protector -fstack-protector-all
+AS = as
+LD = ld
+
+TOPDIR = /home/joni/Projects/GNU/linix/src
+INCLUDE = -I$(TOPDIR)/include
+#-Wextra -Werror
+CFLAGS += $(INCLUDE) -fno-stack-protector -Wall 
+LDFLAGS = -nostdlib -nostartfiles -nodefaultlibs
 KERNEL_SUF = img
 
-%o : %sx
-	$(CC) -o $@ $(DEFINES) -c $(CFLAGS) $<
+%o : %S
+	$(CC) $(DEFINES) $(CFLAGS) -c $< -o $@
 
 %o : %c
-	$(CC) -o $@ $(DEFINES) -c $(CFLAGS) $<
+	$(CC) $(DEFINES) $(CFLAGS) -c $< -o $@
 
 $(lib_a): $(objs)
 	$(AR) -r $@  $(objs)

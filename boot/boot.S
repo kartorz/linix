@@ -6,8 +6,9 @@
  *
  */
         
+#include "boot/asm.h"        
 #include "boot/multiboot.h"
-          
+        
 /* The size of our stack (16KB). */
 #define STACK_SIZE                      0x4000
 
@@ -29,7 +30,7 @@ halt_message:
         .comm   stack, STACK_SIZE
 
 .text
-_LABEL(_start)
+_LABEL(start)
 		jmp     multiboot_entry        
 			/* Align 32 bits boundary. */
 		.align  4
@@ -45,17 +46,17 @@ multiboot_header:
 
 multiboot_entry:
        	/* Initialize the stack pointer. */
-		;; movl $(stack + STACK_SIZE), %esp
-	    ;; /* Reset EFLAGS. */
-	    ;; pushl $0
-	    ;; popf
-        call    gdt_init
+		movl $(stack + STACK_SIZE), %esp
+	    /* Reset EFLAGS. */
+	    pushl $0
+	    popf
+        call   gdt_init
         /* Push the pointer to the Multiboot information structure. */
         pushl   %ebx
         /* Push the magic value. */
         pushl   %eax
         /* Now enter the C main function... */
-        call    _C_LABEL(boot2_main)
+        call  _C_LABEL(boot2_main)
         
 loop: hlt
             jmp     loop
