@@ -22,13 +22,6 @@
 #define LINEAR_LO 0x0000FFFF
 #define LINEAR_HI 0x000C9F00
 
-.data
-.bss        
-halt_message:
-        .asciz  "Halted."     
-            /* Our stack area. */
-        .comm   stack, STACK_SIZE
-
 .text
 _LABEL(start)
 		jmp     multiboot_entry        
@@ -47,18 +40,22 @@ multiboot_header:
 multiboot_entry:
        	/* Initialize the stack pointer. */
 		movl $(stack + STACK_SIZE), %esp
-	    /* Reset EFLAGS. */
-	    pushl $0
-	    popf
-        call   gdt_init
         /* Push the pointer to the Multiboot information structure. */
         pushl   %ebx
         /* Push the magic value. */
         pushl   %eax
+	    /* Reset EFLAGS. */
+	    pushl $0
+	    popf
+        call   gdt_init
         /* Now enter the C main function... */
         call  _C_LABEL(boot2_main)
         
 loop: hlt
             jmp     loop
 
+halt_message:p
+        .asciz  "Halted."
         
+ /* Our stack area. */
+.comm   stack, STACK_SIZE

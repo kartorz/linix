@@ -7,7 +7,7 @@ objs =  boot.o \
 
 include ../common.mk
 
-boot: $(objs)
+boot.bin: $(objs)
 	$(LD) -T linker.ld  $^ -o $@
 
 lib/i386.a: force
@@ -15,5 +15,6 @@ lib/i386.a: force
 
 clean:
 	@find . -name "*.[oadP]" | xargs -I{} rm {}
+	@rm boot.bin
 
 .PHONY: force clean

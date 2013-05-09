@@ -2,7 +2,8 @@ CC = gcc
 AS = as
 LD = ld
 
-TOPDIR = /home/joni/Projects/GNU/linix/src
+#TOPDIR = /home/joni/Projects/GNU/linix/src
+TOPDIR = /home/joni/Projects/linix/linix
 INCLUDE = -I$(TOPDIR)/include
 #-Wextra -Werror
 CFLAGS += $(INCLUDE) -fno-stack-protector -Wall 
