@@ -6,7 +6,7 @@
  *  You can find the minix websit in the README file and, get more information about minix.
  */
 
-#include "boot/asm.h"
+#include "i386/asm.h"
 
 /*
  * Diagnostic print routines callable from 32bit C code during early

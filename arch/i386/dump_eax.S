@@ -6,7 +6,7 @@
  *  You can find the minix websit in the README file and, get more information about minix.
  */
 
-#include "boot/asm.h"
+#include "i386/asm.h"
 
 /* This is useful for debugging - although you may need to
  * delete some code to fit it in.

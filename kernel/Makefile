@@ -1,6 +1,6 @@
 
 lib_a = kernel.a
-objs =  kernel.o ssp.o
+objs =  kernel.o
 
 CFLAGS = -I../boot
 

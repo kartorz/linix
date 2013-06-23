@@ -2,8 +2,11 @@
 
 export TOPDIR =$(shell pwd)
 
-OBJS +=  i386/i386.a kernel/kernel.a 
-subdirs = i386 kernel
+OBJS +=  arch/i386/i386.a \
+	 kernel/kernel.a \
+	 lib/libc/libc.a
+
+subdirs = lib/libc arch/i386 kernel
 
 include common.mk
 

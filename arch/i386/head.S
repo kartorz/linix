@@ -41,8 +41,9 @@ multiboot_entry:
 	    /* Reset EFLAGS. */
 	    pushl $0
 	    popf
+        call _C_LABEL(boot)
         /* Now enter the C main function... */
-        call  _C_LABEL(kmain)
+        /* call  _C_LABEL(kmain) */
         
 loop: hlt
             jmp     loop

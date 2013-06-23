@@ -1,4 +1,4 @@
-#include "boot/asm.h"
+#include "i386/asm.h"
 
 #define	CR0_PE		1
 
