@@ -50,7 +50,15 @@ gdtarg:
 
 _ENTRY(gdt_init)
      .code32
+     pushl	%eax   
+     movl	$gdt, %eax
+	 movl	%eax, gdtarg+2
      lgdt	%cs:gdtarg		/* Global descriptor table */
+     mov	$bootdataseg, %eax
+	 mov	%ax, %ds
+	 mov	%ax, %es
+	 mov	%ax, %ss
+     popl   %eax
      ret
  /*
  * real_to_prot()

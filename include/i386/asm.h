@@ -1,10 +1,6 @@
 
 /*	
- * Copyright (c) 2013
- *	MINIX.
- *
- *  This file comes from minix source code.
- *  You can find the minix websit in the README file and, get more information about minix.
+ * 
  */
 
 #define _ALIGN_TEXT .align 16
@@ -19,10 +15,13 @@
 	.globl x; x:
 
 
-#ifdef __ELF__
+#ifdef _ELF_
 # define _C_LABEL(x)	x
 #else
 #define _C_LABEL(sym)  _ ## sym
 #endif
 
 #define	_ASM_LABEL(x)	x
+
+#define IMPORT(sym)               \
+        .extern _C_LABEL(sym)

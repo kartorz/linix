@@ -1,5 +1,6 @@
-#ifndef MULTIBOOT_HEADER
-#define MULTIBOOT_HEADER 1
+
+#ifndef _MULTIBOOT_H_
+#define _MULTIBOOT_H_ 
      
 /* How many bytes from the start of the file we search for the header. */
 #define MULTIBOOT_SEARCH                        8192
@@ -72,9 +73,8 @@
 /* The flags for the Multiboot header. */
 # define MULTIBOOT_HEADER_FLAGS         0x00000003
 
+#ifndef ASM_SOURCE
 
-//#ifndef ASM_FILE
-#if 0     
 typedef unsigned short          multiboot_uint16_t;
 typedef unsigned int            multiboot_uint32_t;
 typedef unsigned long long      multiboot_uint64_t;
@@ -200,7 +200,6 @@ struct multiboot_mod_list
     multiboot_uint32_t pad;
 };
 typedef struct multiboot_mod_list multiboot_module_t;
-     
-#endif /* ! ASM_FILE */
-     
-#endif /* ! MULTIBOOT_HEADER */
+#endif
+
+#endif

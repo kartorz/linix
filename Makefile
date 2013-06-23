@@ -1,25 +1,27 @@
 
 
-OBJS += kernel/kernel.a
+export TOPDIR =$(shell pwd)
 
-subdirs = kernel
+OBJS +=  i386/i386.a kernel/kernel.a 
+subdirs = i386 kernel
 
 include common.mk
 
-a11: subdir linix
+a11: $(subdirs) linix
 
 linix: $(OBJS)
 	-test -d bin || mkdir bin
-	gcc -o bin/$@.$(KERNEL_SUF)   $^ $(LDFLAGS)
+	$(LD) -T linker.ld  $^ $(LDFLAGS) -o bin/$@.$(KERNEL_SUF)
 
-subdir: force
-	$(foreach d, $(subdirs), $(MAKE) -C $(d))
+$(subdirs):
+	$(MAKE) -C $@
 
-boot: force
-	$(MAKE) -C boot
+iso:
+	-cp bin/linix.$(KERNEL_SUF)  iso
+	grub-mkrescue -o linix.iso iso
 
-.PHONY : clean force
+.PHONY : clean force  iso $(subdirs)
 
 clean:
 	@find . -name "*.[oadP]" | xargs -I{} rm {}
-	-rm -f bin/*
+	-@rm -f bin/*

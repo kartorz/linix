@@ -1,4 +1,4 @@
-#include "multiboot.h"
+#include "i386/multiboot.h"
      
 /* Macros. */
      
@@ -24,7 +24,7 @@ static int ypos;
 static volatile unsigned char *video;
      
 /* Forward declarations. */
-void cmain (unsigned long magic, unsigned long addr);
+void kmain (unsigned long magic, unsigned long addr);
 static void cls (void);
 static void itoa (char *buf, int base, int d);
 static void putchar (int c);
@@ -32,7 +32,7 @@ void printf (const char *format, ...);
      
 /* Check if MAGIC is valid and print the Multiboot information structure
    pointed by ADDR. */
-void cmain (unsigned long magic, unsigned long addr)
+void kmain(unsigned long magic, unsigned long addr)
 {
     multiboot_info_t *mbi;
      
